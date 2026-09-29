@@ -45,6 +45,51 @@ watch([pageNumber, scale, activeMatchIndex], async () => {
   await paint()
 })
 
+const viewportRef = ref<HTMLElement | null>(null)
+let wheelLockUntil = 0
+
+function onWheel(event: WheelEvent) {
+  if (loading.value || rendering.value || pageCount.value <= 1) return
+
+  const el = viewportRef.value
+  if (!el) return
+
+  const delta = event.deltaY
+  if (delta === 0) return
+
+  const atTop = el.scrollTop <= 1
+  const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1
+  const canScroll = el.scrollHeight > el.clientHeight + 2
+
+  const goingDown = delta > 0
+  const goingUp = delta < 0
+
+  const shouldTurnPage = goingDown
+    ? (!canScroll || atBottom) && pageNumber.value < pageCount.value
+    : (!canScroll || atTop) && pageNumber.value > 1
+
+  if (!shouldTurnPage) return
+
+  event.preventDefault()
+
+  const now = Date.now()
+  if (now < wheelLockUntil) return
+  wheelLockUntil = now + 280
+
+  if (goingDown) {
+    nextPage()
+    nextTick(() => {
+      if (viewportRef.value) viewportRef.value.scrollTop = 0
+    })
+  } else {
+    prevPage()
+    nextTick(() => {
+      const view = viewportRef.value
+      if (view) view.scrollTop = view.scrollHeight
+    })
+  }
+}
+
 onBeforeUnmount(() => {
   void destroy()
 })
@@ -78,7 +123,9 @@ onBeforeUnmount(() => {
 
     <div
       v-else
+      ref="viewportRef"
       class="relative min-h-0 flex-1 overflow-auto rounded-md bg-muted/40 p-3"
+      @wheel="onWheel"
     >
       <div
         v-if="loading || rendering"

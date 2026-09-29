@@ -1,3 +1,12 @@
+## 2026-09-29 — CRUD записей технолога + загрузка PDF
+
+- **Что**: Добавление/редактирование записей реестра, загрузка PDF при создании, колонка «Действия» (редактировать / скачать / удалить), поле «Подраздел»
+- **Зачем**: Сценарий технолога по ведению материалов с PDF
+- **Файлы**: `app/pages/index.vue`, `app/components/RegistryRecordForm.vue`, `app/components/RegistryTable.vue`, `app/types/registry.ts`, `mocks/`
+- **Mock**: `mocks/registry-functions.json`, `mocks/registry-catalogs.json`; PDF как blob URL локально
+- **Техдолг / Заметки**: без бэкенда; PDF при редактировании не меняется
+- **Блокеры**: —
+
 ## 2026-09-29 — Реестр функций + PDF в Slideover
 
 - **Что**: Nuxt UI каркас (Header + таблица реестра), просмотр PDF на pdfjs-dist в USlideover (страницы, зум, поиск)
